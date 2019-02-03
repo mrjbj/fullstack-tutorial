@@ -1,4 +1,5 @@
-const ApolloServer = require("apollo-server");
+//ts-check
+const { ApolloServer } = require("apollo-server");
 const typeDefs = require("./schema");
 
 const server = new ApolloServer({ typeDefs });
