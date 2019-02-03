@@ -1,4 +1,8 @@
+const { debugFactory } = require("./debug-util");
+const jlog = debugFactory("schema:");
 const { gql } = require("apollo-server");
+
+jlog.info("Loading GQL typeDefs...");
 
 const typeDefs = gql`
     type Query {
