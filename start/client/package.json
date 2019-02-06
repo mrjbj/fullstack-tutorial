@@ -7,6 +7,8 @@
     "apollo-cache-inmemory": "alpha",
     "apollo-client": "alpha",
     "apollo-link-http": "^1.5.5",
+    "debug": "^4.1.1",
+    "dotenv-safe": "^6.1.0",
     "emotion": "^9.2.12",
     "graphql": "^14.0.2",
     "graphql-tag": "^2.10.0",
