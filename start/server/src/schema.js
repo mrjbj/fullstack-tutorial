@@ -2,13 +2,21 @@ const { debugFactory } = require("./debug-util");
 const jlog = debugFactory("schema:");
 const { gql } = require("apollo-server");
 
-jlog.info("Loading GQL typeDefs...");
+jlog.debug("Loading GQL typeDefs...");
 
 const typeDefs = gql`
     type Query {
-        launches: [Launch]!
+        launches( # replace the current launches query with this one.
+            pageSize: Int # records/page, default is 20
+            after: String # if cursor supplied, will return rows following after
+        ): LaunchConnection!
         launch(id: ID!): Launch
         me: User
+    }
+    type LaunchConnection {
+        cursor: String! # pass into Launches query to return next pageSize chunk after this
+        hasMore: Boolean!
+        launches: [Launch]!
     }
     type Launch {
         id: ID!

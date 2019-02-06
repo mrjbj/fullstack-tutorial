@@ -8,18 +8,15 @@ class LaunchAPI extends RESTDataSource {
         this.baseURL = "https://api.spacexdata.com/v2/";
     }
     async getAllLaunches() {
-        jlog.info("Calling getAllLaunches()");
+        jlog.debug("Calling getAllLaunches()");
         const response = await this.get("launches");
-        // if array comes back then process each launch
-        // if not array, then return empty array
-        //
         // iterative call to launchReducer allows shape of GQL schema
         // to be defined independent from shape of data returned by REST endpoint.
         return Array.isArray(response) ? response.map(launch => this.launchReducer(launch)) : [];
     }
     // reformats data from REST to GQL shape
     launchReducer(launch) {
-        jlog.info("calling launchReducer with launch id = %d", launch.flight_number || -1);
+        jlog.debug("calling launchReducer with launch id = %d", launch.flight_number || -1);
         return {
             id: launch.flight_number || 0,
             cursor: `${launch.launch_date_unix}`,
@@ -37,12 +34,12 @@ class LaunchAPI extends RESTDataSource {
         };
     }
     async getLaunchById({ launchId }) {
-        jlog.info("getLaunchById.launchId = %o", launchId);
+        jlog.debug("getLaunchById.launchId = %o", launchId);
         const response = await this.get("launches", { flight_number: launchId });
         return this.launchReducer(response[0]);
     }
     async getLaunchesById({ launchIds }) {
-        jlog.info("getLaunchesById with [ids] = %o", {launchids });
+        jlog.debug("getLaunchesById with [ids] = %o", {launchIds });
         return Promise.all(launchIds.map(launchId => this.getLaunchById({ launchId })));
     }
 }

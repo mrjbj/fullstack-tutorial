@@ -7,8 +7,10 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "program": "${workspaceFolder}/start/server/src/index.js"
+            "name": "NPM 2",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "debug"],
+            "port": 9229
         }
     ]
 }
