@@ -40,12 +40,14 @@ module.exports = {
         //set default size to 'large' in case not specified.
         missionPatch: (mission, { size } = { size: "LARGE" }) => {
             jlog.debug("missionPatch Resolver. Size = %s", size);
+            jlog.debug("missionPatch.missionPatchSmall= %s", mission.missionPatchSmall);
+            jlog.debug("missionPatch.missionPatchLarge= %s", mission.missionPatchLarge);
             return size === "SMALL" ? mission.missionPatchSmall : mission.missionPatchLarge;
         }
     },
     Launch: {
         isBooked: async (launch, _, { dataSources }) =>
-            dataSources.isBookedOnLaunch({ launchId: launch.id })
+            dataSources.userAPI.isBookedOnLaunch({ launchId: launch.id })
     },
     User: {
         trips: async (_, __, { dataSources }) => {
