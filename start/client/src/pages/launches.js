@@ -1,7 +1,22 @@
 import gql from "graphql-tag";
 import React, { Fragment } from "react";
 import { Query } from "react-apollo";
-import { Header, LaunchTile, Loading } from "../components";
+import { Button, Header, LaunchTile, Loading } from "../components";
+
+export const LAUNCH_TILE_DATA = gql`
+    fragment LaunchTile on Launch {
+        id
+        isBooked
+        rocket {
+            id
+            name
+        }
+        mission {
+            name
+            missionPatch
+        }
+    }
+`;
 
 const GET_LAUNCHES = gql`
     query launchList($after: String) {
@@ -9,19 +24,11 @@ const GET_LAUNCHES = gql`
             cursor
             hasMore
             launches {
-                id
-                isBooked
-                rocket {
-                    id
-                    name
-                }
-                mission {
-                    name
-                    missionPatch
-                }
+                ...LaunchTile
             }
         }
     }
+    ${LAUNCH_TILE_DATA}
 `;
 
 // render prop with render function as props.children
@@ -34,7 +41,7 @@ const GET_LAUNCHES = gql`
 export default function Launches() {
     return (
         <Query query={GET_LAUNCHES}>
-            {({ data, loading, error }) => {
+            {({ data, loading, error, fetchMore }) => {
                 // error
                 if (loading) return <Loading />;
                 if (error) {
@@ -51,6 +58,32 @@ export default function Launches() {
                             data.launches.launches.map(launch => (
                                 <LaunchTile key={launch.id} launch={launch} />
                             ))}
+                        {/* paginate if needed */}
+                        {console.log(data.launches)}
+                        {data.launches && data.launches.hasMore && (
+                            <Button
+                                onClick={() =>
+                                    fetchMore({
+                                        variables: { after: data.launches.cursor },
+                                        updateQuery: (prev, { fetchMoreResult, ...rest }) => {
+                                            if (!fetchMoreResult) return prev;
+                                            return {
+                                                ...fetchMoreResult,
+                                                launches: {
+                                                    ...fetchMoreResult.launches,
+                                                    launches: [
+                                                        ...prev.launches.launches,
+                                                        ...fetchMoreResult.launches.launches
+                                                    ]
+                                                }
+                                            };
+                                        }
+                                    })
+                                }
+                            >
+                                Load More
+                            </Button>
+                        )}
                     </Fragment>
                 );
             }}
