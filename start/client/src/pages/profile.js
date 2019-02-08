@@ -1,5 +1,8 @@
+import React, { Fragment } from "react";
+import { Query } from "react-apollo";
 import gql from "graphql-tag";
-import { LaunchTile } from "../components";
+
+import { LaunchTile, Header, Loading } from "../components";
 import { LAUNCH_TILE_DATA } from "./launches";
 
 const GET_MY_TRIPS = gql`

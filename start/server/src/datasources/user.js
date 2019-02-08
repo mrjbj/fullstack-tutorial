@@ -30,9 +30,17 @@ class UserAPI extends DataSource {
         const email = this.context && this.context.user ? this.context.user.email : emailArg;
         jlog.debug("findOrCreateUser.email = %o", email);
         jlog.debug("findOrCreateUser.context = %O", this.context);
-        if (!email || !isEmail.validate(email)) return null;
+        if (!email) {
+            return null;
+        }
+        jlog.debug("findOrCreateUser.email is not null");
+        if (!isEmail.validate(email)) {
+            return null;
+        }
+        jlog.debug("findOrCreateUser.email is valid ");
 
         const users = await this.store.users.findOrCreate({ where: { email } });
+        jlog.debug("findOrCreateUser.users[0] = %O", users[0]);
         return users && users[0] ? users[0] : null;
     }
 

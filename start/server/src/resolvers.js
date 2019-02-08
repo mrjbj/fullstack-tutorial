@@ -33,7 +33,16 @@ module.exports = {
         },
         me: async (_, __, { dataSources }) => {
             jlog.debug("calling me.findOrCreateUser with DataSources = %O", { dataSources });
-            dataSources.userAPI.findOrCreateUser();
+            const lUser = await dataSources.userAPI.findOrCreateUser();
+            if (lUser) {
+                const lTrips = await dataSources.userAPI.getLaunchIdsByUser();
+                jlog.info("User: %s, Trips: %O", lUser.email, lTrips);
+                const foo = Object.assign({}, lUser, lTrips);
+                jlog.info("me.returnVal = %O", foo);
+                return foo; 
+            } else {
+                return lUser;
+            }
         }
     },
     Mission: {
@@ -61,35 +70,36 @@ module.exports = {
             const user = await dataSources.userAPI.findOrCreateUser({ email });
             if (user) return Buffer.from(email).toString("base64");
         },
-        bookTrips: async (_, {launchIds}, {dataSources}) => {
-            const results = await dataSources.userAPI.bookTrips({launchIds});
-            const launches = await dataSources.launchAPI.getLaunchesById({launchIds});
+        bookTrips: async (_, { launchIds }, { dataSources }) => {
+            const results = await dataSources.userAPI.bookTrips({ launchIds });
+            const launches = await dataSources.launchAPI.getLaunchesById({ launchIds });
 
             return {
                 success: results && results.length === launchIds.length,
-                message: results.length === launchIds.length 
-                ? "trips booked successfully"
-                : `the following trips couldn't be booked: ${launchIds.filter(
-                    id => !results.includes(id),
-                )}`,
-                launches, 
+                message:
+                    results.length === launchIds.length
+                        ? "trips booked successfully"
+                        : `the following trips couldn't be booked: ${launchIds.filter(
+                              id => !results.includes(id)
+                          )}`,
+                launches
             };
         },
-        cancelTrip: async (_,  {launchId}, {dataSources}) =>  {
-            const result = dataSources.userAPI.cancelTrip({launchId});
+        cancelTrip: async (_, { launchId }, { dataSources }) => {
+            const result = dataSources.userAPI.cancelTrip({ launchId });
 
-            if (!result) 
-            return {
-                success: false, 
-                message: "failed to cancel trip",
-            };
+            if (!result)
+                return {
+                    success: false,
+                    message: "failed to cancel trip"
+                };
 
-            const launch = await dataSources.launchAPI.getLaunchById({launchId});
+            const launch = await dataSources.launchAPI.getLaunchById({ launchId });
             return {
                 success: true,
-                message: "trip canceled.", 
-                launches: [launch],
+                message: "trip canceled.",
+                launches: [launch]
             };
-        },
-    },
+        }
+    }
 };
